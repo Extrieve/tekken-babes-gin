@@ -1,16 +1,19 @@
 package database
 
 import (
-	"fmt"
+	"context"
 	"log"
 	"os"
+	"time"
 
 	"github.com/joho/godotenv"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var DB *gorm.DB
+var MongoClient *mongo.Client
+var CharacterCollection *mongo.Collection
+var BattleCollection *mongo.Collection
 
 func Connect() {
     err := godotenv.Load()
@@ -18,21 +21,34 @@ func Connect() {
         log.Fatal("Error loading .env file")
     }
 
-    dbUser := os.Getenv("DB_USER")
-    dbPassword := os.Getenv("DB_PASSWORD")
-    dbHost := os.Getenv("DB_HOST")
-    dbPort := os.Getenv("DB_PORT")
-    dbName := os.Getenv("DB_NAME")
-
-    dsn := fmt.Sprintf(
-        "host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=UTC",
-        dbHost, dbUser, dbPassword, dbName, dbPort,
-    )
-
-    database, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-    if err != nil {
-        log.Fatal("Failed to connect to database: ", err)
+    mongoURI := os.Getenv("MONGO_URI")
+    if mongoURI == "" {
+        mongoURI = "mongodb://localhost:27017"
     }
 
-    DB = database
+    ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+    defer cancel()
+
+    clientOptions := options.Client().ApplyURI(mongoURI)
+    client, err := mongo.Connect(ctx, clientOptions)
+    if err != nil {
+        log.Fatal("Failed to connect to MongoDB:", err)
+    }
+
+    err = client.Ping(ctx, nil)
+    if err != nil {
+        log.Fatal("Failed to ping MongoDB:", err)
+    }
+
+    MongoClient = client
+
+    dbName := os.Getenv("MONGO_DB_NAME")
+    if dbName == "" {
+        dbName = "tekken_hotness_db"
+    }
+
+    CharacterCollection = client.Database(dbName).Collection("characters")
+    BattleCollection = client.Database(dbName).Collection("battles")
+
+    log.Println("Connected to MongoDB!")
 }

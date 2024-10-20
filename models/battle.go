@@ -3,16 +3,13 @@ package models
 import (
 	"time"
 
-	"gorm.io/gorm"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type Battle struct {
-    ID             uint           `gorm:"primaryKey" json:"id"`
-    CharacterOneID uint           `json:"character_one_id"`
-    CharacterTwoID uint           `json:"character_two_id"`
-    WinnerID       uint           `json:"winner_id"`
-    BattleTime     time.Time      `json:"battle_time"`
-    CreatedAt      time.Time      `json:"created_at"`
-    UpdatedAt      time.Time      `json:"updated_at"`
-    DeletedAt      gorm.DeletedAt `gorm:"index" json:"-"`
+    ID             primitive.ObjectID `bson:"_id,omitempty" json:"id"`
+    CharacterOneID primitive.ObjectID `bson:"character_one_id" json:"character_one_id"`
+    CharacterTwoID primitive.ObjectID `bson:"character_two_id" json:"character_two_id"`
+    WinnerID       primitive.ObjectID `bson:"winner_id" json:"winner_id"`
+    BattleTime     time.Time          `bson:"battle_time" json:"battle_time"`
 }

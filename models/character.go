@@ -1,18 +1,13 @@
 package models
 
 import (
-	"time"
-
-	"gorm.io/gorm"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type Character struct {
-    ID        uint           `gorm:"primaryKey" json:"id"`
-    Name      string         `json:"name"`
-    ImageURL  string         `json:"image_url"`
-    Bio       string         `json:"bio"`
-    TotalWins uint           `json:"total_wins"`
-    CreatedAt time.Time      `json:"created_at"`
-    UpdatedAt time.Time      `json:"updated_at"`
-    DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
+    ID        primitive.ObjectID `bson:"_id,omitempty" json:"id"`
+    Name      string             `bson:"name" json:"name"`
+    ImageURL  string             `bson:"image_url" json:"image_url"`
+    Bio       string             `bson:"bio" json:"bio"`
+    TotalWins int                `bson:"total_wins" json:"total_wins"`
 }

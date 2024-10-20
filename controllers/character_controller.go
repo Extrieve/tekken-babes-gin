@@ -1,24 +1,32 @@
 package controllers
 
 import (
+	"context"
 	"net/http"
-	"strconv"
+	"time"
 
 	"github.com/extrieve/tekken-babes-gin/database"
 	"github.com/extrieve/tekken-babes-gin/models"
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func GetCharacter(c *gin.Context) {
     idParam := c.Param("id")
-    id, err := strconv.Atoi(idParam)
+    objectID, err := primitive.ObjectIDFromHex(idParam)
     if err != nil {
         c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid character ID"})
         return
     }
 
+    ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+    defer cancel()
+
     var character models.Character
-    if err := database.DB.First(&character, id).Error; err != nil {
+    err = database.CharacterCollection.FindOne(ctx, bson.M{"_id": objectID}).Decode(&character)
+    if err != nil {
         c.JSON(http.StatusNotFound, gin.H{"error": "Character not found"})
         return
     }
@@ -27,12 +35,24 @@ func GetCharacter(c *gin.Context) {
 }
 
 func GetLeaderboard(c *gin.Context) {
+    ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+    defer cancel()
+
+    opts := options.Find().SetSort(bson.D{{Key: "total_wins", Value: -1}})
+
+    cursor, err := database.CharacterCollection.Find(ctx, bson.M{}, opts)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+    defer cursor.Close(ctx)
+
     var characters []models.Character
-    result := database.DB.Order("total_wins desc").Find(&characters)
-    if result.Error != nil {
-        c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
+    if err = cursor.All(ctx, &characters); err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
         return
     }
 
     c.JSON(http.StatusOK, characters)
 }
+

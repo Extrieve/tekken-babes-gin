@@ -1,30 +1,50 @@
 package database
 
-import "github.com/extrieve/tekken-babes-gin/models"
+import (
+	"context"
+	"log"
+	"time"
 
-// SeedData inserts initial data into the database
+	"github.com/extrieve/tekken-babes-gin/models"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
+
 func SeedData() {
-    var count int64
-    DB.Model(&models.Character{}).Count(&count)
+    ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+    defer cancel()
+
+    count, err := CharacterCollection.CountDocuments(ctx, bson.M{})
+    if err != nil {
+        log.Fatal("Failed to count documents:", err)
+    }
+
     if count > 0 {
         return // Data already exists
     }
 
-    characters := []models.Character{
-        {
-            Name:     "Anna Williams",
-            ImageURL: "https://example.com/images/anna.jpg",
-            Bio:      "Anna Williams is an Irish female assassin and the younger sister of Nina Williams.",
+    characters := []interface{}{
+        models.Character{
+            ID:        primitive.NewObjectID(),
+            Name:      "Anna Williams",
+            ImageURL:  "https://example.com/images/anna.jpg",
+            Bio:       "Anna Williams is an Irish female assassin and the younger sister of Nina Williams.",
+            TotalWins: 0,
         },
-        {
-            Name:     "Nina Williams",
-            ImageURL: "https://example.com/images/nina.jpg",
-            Bio:      "Nina Williams is an Irish professional assassin who specializes in assassination and other martial arts.",
+        models.Character{
+            ID:        primitive.NewObjectID(),
+            Name:      "Nina Williams",
+            ImageURL:  "https://example.com/images/nina.jpg",
+            Bio:       "Nina Williams is an Irish professional assassin who specializes in assassination and other martial arts.",
+            TotalWins: 0,
         },
         // Add more characters...
     }
 
-    for _, character := range characters {
-        DB.Create(&character)
+    _, err = CharacterCollection.InsertMany(ctx, characters)
+    if err != nil {
+        log.Fatal("Failed to seed data:", err)
     }
+
+    log.Println("Database seeded with initial data.")
 }
