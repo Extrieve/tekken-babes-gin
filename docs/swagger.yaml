@@ -1,0 +1,154 @@
+basePath: /api
+definitions:
+  controllers.VoteInput:
+    properties:
+      currentStreak:
+        type: integer
+      loserId:
+        type: string
+      winnerId:
+        type: string
+    required:
+    - loserId
+    - winnerId
+    type: object
+  models.Character:
+    properties:
+      bio:
+        type: string
+      id:
+        type: string
+      image_url:
+        type: string
+      name:
+        type: string
+      total_wins:
+        type: integer
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: youremail@example.com
+    name: Your Name
+  description: This is the API documentation for the Tekken Hotness Battle application.
+  license:
+    name: MIT License
+    url: https://opensource.org/licenses/MIT
+  termsOfService: http://swagger.io/terms/
+  title: Tekken Hotness Battle API
+  version: "1.0"
+paths:
+  /api/battle:
+    get:
+      consumes:
+      - application/json
+      description: Get two random characters for the battle page
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Retrieve two random characters for a battle
+      tags:
+      - Battle
+  /api/battle/vote:
+    post:
+      consumes:
+      - application/json
+      description: Submit a vote and track win streaks
+      parameters:
+      - description: Vote Input
+        in: body
+        name: voteInput
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.VoteInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Submit a vote for the hotter character
+      tags:
+      - Battle
+  /api/characters/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get character details by ID
+      parameters:
+      - description: Character ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Character'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get detailed information about a character
+      tags:
+      - Character
+  /api/leaderboard:
+    get:
+      consumes:
+      - application/json
+      description: Get characters ranked by total wins
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Character'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Retrieve the leaderboard of characters
+      tags:
+      - Leaderboard
+swagger: "2.0"

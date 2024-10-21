@@ -13,6 +13,17 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+// GetCharacter godoc
+// @Summary      Get detailed information about a character
+// @Description  Get character details by ID
+// @Tags         Character
+// @Accept       json
+// @Produce      json
+// @Param        id   path      string  true  "Character ID"
+// @Success      200  {object}  models.Character
+// @Failure      400  {object}  map[string]string
+// @Failure      404  {object}  map[string]string
+// @Router       /api/characters/{id} [get]
 func GetCharacter(c *gin.Context) {
     idParam := c.Param("id")
     objectID, err := primitive.ObjectIDFromHex(idParam)
@@ -34,6 +45,15 @@ func GetCharacter(c *gin.Context) {
     c.JSON(http.StatusOK, character)
 }
 
+// GetLeaderboard godoc
+// @Summary      Retrieve the leaderboard of characters
+// @Description  Get characters ranked by total wins
+// @Tags         Leaderboard
+// @Accept       json
+// @Produce      json
+// @Success      200  {array}   models.Character
+// @Failure      500  {object}  map[string]string
+// @Router       /api/leaderboard [get]
 func GetLeaderboard(c *gin.Context) {
     ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
     defer cancel()

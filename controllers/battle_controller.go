@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	// _ "../docs" // Import docs to generate Swagger docs
 	"github.com/extrieve/tekken-babes-gin/database"
 	"github.com/extrieve/tekken-babes-gin/models"
 	"github.com/gin-gonic/gin"
@@ -14,6 +15,22 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+// VoteInput represents the input for submitting a vote
+type VoteInput struct {
+    WinnerID     string `json:"winnerId" binding:"required"`
+    LoserID      string `json:"loserId" binding:"required"`
+    CurrentStreak int    `json:"currentStreak"`
+}
+
+// GetBattle godoc
+// @Summary      Retrieve two random characters for a battle
+// @Description  Get two random characters for the battle page
+// @Tags         Battle
+// @Accept       json
+// @Produce      json
+// @Success      200  {object}  map[string]interface{}
+// @Failure      500  {object}  map[string]string
+// @Router       /api/battle [get]
 func GetBattle(c *gin.Context) {
     ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
     defer cancel()
@@ -58,13 +75,18 @@ func GetBattle(c *gin.Context) {
     })
 }
 
+// SubmitVote godoc
+// @Summary      Submit a vote for the hotter character
+// @Description  Submit a vote and track win streaks
+// @Tags         Battle
+// @Accept       json
+// @Produce      json
+// @Param        voteInput  body      controllers.VoteInput  true  "Vote Input"
+// @Success      200        {object}  map[string]interface{}
+// @Failure      400        {object}  map[string]string
+// @Failure      500        {object}  map[string]string
+// @Router       /api/battle/vote [post]
 func SubmitVote(c *gin.Context) {
-    type VoteInput struct {
-        WinnerID     string `json:"winnerId" binding:"required"`
-        LoserID      string `json:"loserId" binding:"required"`
-        CurrentStreak int    `json:"currentStreak"`
-    }
-
     var input VoteInput
     if err := c.ShouldBindJSON(&input); err != nil {
         c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
