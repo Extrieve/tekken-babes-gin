@@ -11,6 +11,7 @@ func RegisterRoutes(router *gin.Engine) {
         api.GET("/battle", controllers.GetBattle)
         api.POST("/battle/vote", controllers.SubmitVote)
         api.GET("/characters/:id", controllers.GetCharacter)
+        api.GET("/characters", controllers.GetCharacters)
         api.GET("/leaderboard", controllers.GetLeaderboard)
     }
 }

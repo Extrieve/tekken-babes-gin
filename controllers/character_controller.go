@@ -23,7 +23,7 @@ import (
 // @Success      200  {object}  models.Character
 // @Failure      400  {object}  map[string]string
 // @Failure      404  {object}  map[string]string
-// @Router       /api/characters/{id} [get]
+// @Router       /characters/{id} [get]
 func GetCharacter(c *gin.Context) {
     idParam := c.Param("id")
     objectID, err := primitive.ObjectIDFromHex(idParam)
@@ -43,6 +43,35 @@ func GetCharacter(c *gin.Context) {
     }
 
     c.JSON(http.StatusOK, character)
+}
+
+// Get all characters
+// @Summary      Retrieve all characters
+// @Description  Get all characters in the database
+// @Tags         Character
+// @Accept       json
+// @Produce      json
+// @Success      200  {array}   models.Character
+// @Failure      500  {object}  map[string]string
+// @Router       /api/characters [get]
+func GetCharacters(c *gin.Context) {
+    ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+    defer cancel()
+
+    cursor, err := database.CharacterCollection.Find(ctx, bson.M{})
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+    defer cursor.Close(ctx)
+
+    var characters []models.Character
+    if err = cursor.All(ctx, &characters); err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+
+    c.JSON(http.StatusOK, characters)
 }
 
 // GetLeaderboard godoc

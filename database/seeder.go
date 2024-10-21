@@ -20,6 +20,7 @@ func SeedData() {
     }
 
     if count > 0 {
+        log.Println("Data already exists in the database.")
         return // Data already exists
     }
 

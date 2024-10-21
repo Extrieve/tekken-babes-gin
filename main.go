@@ -20,7 +20,6 @@ import (
 // @license.name    MIT License
 // @license.url     https://opensource.org/licenses/MIT
 // @host            localhost:8080
-// @BasePath        /api
 func main() {
     database.Connect()
     database.SeedData()

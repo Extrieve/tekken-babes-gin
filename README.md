@@ -87,7 +87,7 @@ The **Tekken Babes Backend** is a RESTful API built with Go and the Gin web fram
    Create a new PostgreSQL database:
 
    ```sql
-   CREATE DATABASE tekken_hotness_db;
+   CREATE DATABASE tekken_babes_db;
    ```
 
 2. **Set Up Environment Variables**
@@ -99,7 +99,7 @@ The **Tekken Babes Backend** is a RESTful API built with Go and the Gin web fram
    DB_PORT=5432
    DB_USER=your_db_user
    DB_PASSWORD=your_db_password
-   DB_NAME=tekken_hotness_db
+   DB_NAME=tekken_babes_db
    ```
 
    Replace the placeholders with your actual database credentials.

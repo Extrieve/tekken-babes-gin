@@ -1,4 +1,3 @@
-basePath: /api
 definitions:
   controllers.VoteInput:
     properties:
@@ -95,7 +94,53 @@ paths:
       summary: Submit a vote for the hotter character
       tags:
       - Battle
-  /api/characters/{id}:
+  /api/characters:
+    get:
+      consumes:
+      - application/json
+      description: Get all characters in the database
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Character'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Retrieve all characters
+      tags:
+      - Character
+  /api/leaderboard:
+    get:
+      consumes:
+      - application/json
+      description: Get characters ranked by total wins
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Character'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Retrieve the leaderboard of characters
+      tags:
+      - Leaderboard
+  /characters/{id}:
     get:
       consumes:
       - application/json
@@ -128,27 +173,4 @@ paths:
       summary: Get detailed information about a character
       tags:
       - Character
-  /api/leaderboard:
-    get:
-      consumes:
-      - application/json
-      description: Get characters ranked by total wins
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.Character'
-            type: array
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Retrieve the leaderboard of characters
-      tags:
-      - Leaderboard
 swagger: "2.0"

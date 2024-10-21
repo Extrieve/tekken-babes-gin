@@ -44,7 +44,7 @@ func Connect() {
 
     dbName := os.Getenv("MONGO_DB_NAME")
     if dbName == "" {
-        dbName = "tekken_hotness_db"
+        dbName = "tekken_babes_db"
     }
 
     CharacterCollection = client.Database(dbName).Collection("characters")
