@@ -45,6 +45,34 @@ func GetCharacter(c *gin.Context) {
     c.JSON(http.StatusOK, character)
 }
 
+// get character by name
+// @Summary      Get detailed information about a character
+// @Description  Get character details by name
+// @Tags         Character
+// @Accept       json
+// @Produce      json
+// @Param        name   path      string  true  "Character Name"
+// @Success      200  {object}  models.Character
+// @Failure      400  {object}  map[string]string
+// @Failure      404  {object}  map[string]string
+// @Router       /characters/{name} [get]
+func GetCharacterByName(c *gin.Context) {
+    name := c.Param("name")
+
+    ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+    defer cancel()
+
+    var character models.Character
+    err := database.CharacterCollection.FindOne(ctx, bson.M{"name": name}).Decode(&character)
+    if err != nil {
+        c.JSON(http.StatusNotFound, gin.H{"error": "Character not found"})
+        return
+    }
+
+    c.JSON(http.StatusOK, character)
+}
+
+
 // Get all characters
 // @Summary      Retrieve all characters
 // @Description  Get all characters in the database
