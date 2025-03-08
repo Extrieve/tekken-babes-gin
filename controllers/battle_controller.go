@@ -137,3 +137,15 @@ func SubmitVote(c *gin.Context) {
         })
     }
 }
+
+// Ping godoc
+// @Summary      Ping the server
+// @Description  Ping the server to check if it's alive
+// @Tags         Battle
+// @Accept       json
+// @Produce      json
+// @Success      200  {object}  map[string]string
+// @Router       /api/ping [get]
+func Ping(c *gin.Context) {
+    c.JSON(http.StatusOK, gin.H{"message": "Pong"})
+}
